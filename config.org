@@ -3,14 +3,17 @@
 
 * Introduction
 This is John Conway's Emacs configuration (mostly stolen from Runemacs).
-Started: 12/20/2018
-Last Update: 07/12/2021
+- Started: 12/20/2018
+- Last Update: 07/12/2021
 
 ** For Windows Taskbar Pinning
 1. Run Emacs
 2. Pin icon to taskbar
 3. Right click icon -> right click Emacs -> properties -> point to runemacs.exe
    
+** Requirements
+This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font. Also, make sure to run /(all-the-icons-install-fonts)/ on a fresh setup. On Windows, the .tff files will need to be manually installed
+
 * General Settings
 ** Basic Functionality
 #+begin_src emacs-lisp 
