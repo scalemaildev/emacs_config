@@ -69,7 +69,7 @@
 ;; --------
 (use-package doom-themes
   :config
-  (load-theme 'doom-nord t))
+  (load-theme 'doom-dark+ t))
 
 ;; ---------
 ;; General Packages
@@ -178,6 +178,11 @@
 ;; Rainbow Delimiters
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
+
+;; ----------
+;; Org Mode
+;; ----------
+
 
 ;; ----------
 ;; Languages
