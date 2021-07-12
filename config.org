@@ -1,4 +1,4 @@
-#+title Clownway Emacs
+#+TITLE: Clownway Emacs
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
 * Introduction
