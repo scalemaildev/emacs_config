@@ -91,13 +91,13 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
 
 *** Auto-Tangle Configuration Files
 #+begin_src emacs-lisp
-(defun efs/org-babel-tangle-config ()
+(defun configorg/org-babel-tangle-config ()
   (when (string-equal (file-name-directory (buffer-file-name))
                       (expand-file-name user-emacs-directory))
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
 
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'configorg/org-babel-tangle-config)))
 #+end_src
 
 * Package Management
@@ -255,7 +255,7 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
 ** Org Mode
 *** Settings
 #+begin_src emacs-lisp
-(defun org-mode-setup ()
+(defun configorg/org-mode-setup ()
   (org-indent-mode)
   (variable-pitch-mode t)
   (auto-fill-mode 0)
@@ -265,7 +265,7 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
 *** Symbols
 #+begin_src emacs-lisp
 (use-package org
-  :hook (org-mode . org-mode-setup)
+  :hook (org-mode . configorg/org-mode-setup)
   :config
   (setq org-ellipsis " ↴↴↴"
 	org-hide-emphasis-markers t))
