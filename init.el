@@ -22,13 +22,19 @@
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (tooltip-mode -1)
-(set-fringe-mode 2)
+(set-fringe-mode 5)
 (menu-bar-mode -1)
 
 (setq show-paren-delay 0)
 (show-paren-mode 1)
 
-(global-linum-mode t)
+(global-display-line-numbers-mode t)
+;; exceptional modes
+(dolist (mode '(org-mode-hook
+		term-mode-hook
+		eshell-mode-hook
+		shell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (setq make-backup-files nil)
 (setq auto-save-default nil)
@@ -57,14 +63,13 @@
   (package-install 'use-package))
 (require 'use-package)
 (setq use-package-always-ensure 't)
-(use-package command-log-mode)
 
 ;; --------
 ;; Theme
 ;; --------
 (use-package doom-themes
   :config
-  (load-theme 'doom-dark+ t))
+  (load-theme 'doom-nord t))
 
 ;; ---------
 ;; General Packages
@@ -87,12 +92,12 @@
 	helm-autoresize-max-height 0
 	helm-autoresize-min-height 20)
   :config
-  (helm-mode 1))
+  (helm-mode t))
 
 ;; Projectile
 (use-package projectile
   :config
-  (projectile-mode 1))
+  (projectile-mode t))
 
 ;; Helm-Projectile
 (use-package helm-projectile
@@ -117,7 +122,7 @@
 ;; Beacon
 (use-package beacon
   :init
-  (beacon-mode 1))
+  (beacon-mode t))
 
 ;; Company
 (use-package company)
@@ -129,8 +134,10 @@
 
 ;; Which Key
 (use-package which-key
+  :init (which-key-mode)
+  :diminish (which-key-mode)
   :config
-  (which-key-mode 1))
+  (setq which-key-idle-delay 0.3))
 
 ;; Spaceline
 (use-package spaceline
@@ -168,6 +175,10 @@
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 
+;; Rainbow Delimiters
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
 ;; ----------
 ;; Languages
 ;; ----------
@@ -200,7 +211,7 @@
    ;; Projectile
    "C-c m p f" '(projectile-find-file :which-key "projectile find file")
    ;; Beacon
-   "C-'" '(beacon-blink :which-key "blink beacon")   
+   "C-'" '(beacon-blink :which-key "blink beacon")
    ;; General Compiling
    "C-c m c" '(compile :which-key "general compile")
    "C-c m r" '(recompile :which-key "general recompile")
