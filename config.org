@@ -75,17 +75,18 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
 #+end_src
 
 ** Babel
+*** Load Languages
 #+begin_src emacs-lisp 
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((emacs-lisp . t)
-   (python . t)))
+ '((emacs-lisp . t)))
+#+end_src
 
+*** Org Structure Template
+#+begin_src emacs-lisp
 (with-eval-after-load 'org
   (require 'org-tempo)
-  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("py" . "src python")))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+end_src
 
 *** Auto-Tangle Configuration Files
@@ -100,6 +101,7 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
 #+end_src
 
 * Package Management
+** Package
 #+begin_src emacs-lisp
 (require 'package)
 (setq package-enable-at-startup nil)
@@ -107,10 +109,13 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
                          ("gnu"   . "http://elpa.gnu.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
 (package-initialize)
-
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+#+end_src
+
+** Use-Package
+#+begin_src emacs-lisp
 (require 'use-package)
 (setq use-package-always-ensure 't)
 #+end_src
@@ -164,9 +169,7 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
 
 *** Magit
 #+begin_src emacs-lisp
-(use-package magit
-  :bind
-  (("C-c m m" . magit)))
+(use-package magit)
 #+end_src
 
 *** Flycheck
@@ -234,7 +237,6 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
                  (switch-to-buffer shell-pop-last-buffer)
                (delete-window))))))))))
 (push (cons "\\*shell\\*" display-buffer--same-window-action) display-buffer-alist)
-(global-set-key (read-kbd-macro "C-c t") 'shell-pop)
 #+end_src
 
 *** Exec Path From Shell
@@ -327,6 +329,10 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
    "C-c m f " '(helm-find-files :which-key "helm find files")
    ;; Projectile
    "C-c m p f" '(projectile-find-file :which-key "projectile find file")
+   ;; Magit
+   "C-c mm" 'magit
+   ;; Shell-Pop
+   "C-c t" 'shell-pop
    ;; Beacon
    "C-'" '(beacon-blink :which-key "blink beacon")
    ;; General Compiling
