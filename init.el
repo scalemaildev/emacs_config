@@ -1,4 +1,4 @@
-;; -----------------------------------------------------------------------------------
+;; ----------
 ;; This is John Conway's Emacs config
 ;; Started: 12/20/2018
 ;; Last Update: 07/12/2021
@@ -7,7 +7,7 @@
 ;; 1. Run Emacs
 ;; 2. Pin icon to taskbar
 ;; 3. Right click icon -> right click Emacs -> properties -> point to runemacs.exe
-;; -----------------------------------------------------------------------------------
+;; ----------
 
 ;; ----------
 ;; Global Settings
@@ -167,6 +167,11 @@
 (use-package exec-path-from-shell)
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
+
+;; ----------
+;; Languages
+;; ----------
+;; 
 
 ;; ----------
 ;; Keybinds (General)
