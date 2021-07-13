@@ -297,8 +297,7 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
 #+begin_src emacs-lisp
 (setq org-src-preserve-indentation t)
 #+end_src
-
-** Languages
+** IDE Features
 *** LSP
 **** Core
 #+begin_src emacs-lisp
@@ -345,20 +344,56 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
 (use-package lsp-treemacs
   :after lsp)
 #+end_src
-*** Python
-*** JavaScript
-*** C#
-*** C/C++
-*** Vue
-*** Html
-*** TypeScript
+
+*** DAP
+**** Core
 #+begin_src emacs-lisp
-(use-package typescript-mode
-  :mode "\\.ts\\'"
-  :hook (typescript-mode . lsp-deferred)
+(use-package dap-mode
+  ;; Uncomment the config below if you want all UI panes to be hidden by default!
+  ;; :custom
+  ;; (lsp-enable-dap-auto-configure nil)
+  ;; :config
+  ;; (dap-ui-mode 1)
+  :commands dap-debug
   :config
-  (setq typescript-indent-level 2))
+  (require 'dap-node)
+  (dap-node-setup) ;; Automatically installs Node debug adapter if needed
+
+  (general-define-key
+    :keymaps 'lsp-mode-map
+    :prefix lsp-keymap-prefix
+    "d" '(dap-hydra t :wk "debugger")))
 #+end_src
+** Languages
+*** Python
+#+begin_src emacs-lisp
+(use-package python-mode
+  :ensure t
+  :hook (python-mode . lsp-deferred)
+  :custom
+  (dap-python-debugger 'debugpy)
+  :config
+  (require 'dap-python))
+#+end_src
+**** Windows LSP
+Make sure Python 3 and PIP are installed and run /"pip install 'python-language-server[all]'"/ to get the language server.
+#+begin_src emacs-lisp
+(when (eq system-type 'windows-nt)
+  (use-package lsp-python-ms
+  :ensure t
+  :init (setq lsp-python-ms-auto-install-server t)
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-python-ms)
+                          (lsp)))))
+#+end_src
+*** JavaScript
+Make sure NodeJS and NPM are installed and run /"npm install -g typescript-language-server typescript"/ to get the language server.
+#+begin_src emacs-lisp
+(use-package js2-mode
+  :mode "\\.js\\'"
+  :hook (js2-mode . lsp-deferred))
+#+end_src
+*** Vue
 * Keybinds
 #+begin_src emacs-lisp
 (use-package general
