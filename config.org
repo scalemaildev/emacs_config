@@ -58,13 +58,14 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
 (dolist (mode '(org-mode-hook
 		term-mode-hook
 		eshell-mode-hook
+		treemacs-mode-hook
 		shell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
 *** Font
 #+begin_src emacs-lisp 
-(set-face-attribute 'default nil :font "Mononoki" :height 125)
+(set-face-attribute 'default nil :font "Mononoki" :height 140)
 #+end_src
 
 *** Theme
@@ -184,11 +185,6 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
   (beacon-mode t))
 #+end_src
 
-*** Company
-#+begin_src emacs-lisp
-(use-package company)
-#+end_src
-
 *** Dimmer
 #+begin_src emacs-lisp
 (use-package dimmer
@@ -303,7 +299,66 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
 #+end_src
 
 ** Languages
+*** LSP
+**** Core
+#+begin_src emacs-lisp
+(defun configorg/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
 
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :hook (lsp-mode . configorg/lsp-mode-setup)
+  :init
+  (setq lsp-keymap-prefix "C-c C-l")  ;; Or 'C-l', 's-l'
+  :config
+  (lsp-enable-which-key-integration t))
+#+end_src
+
+**** LSP UI
+#+begin_src emacs-lisp
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
+#+end_src
+
+**** Company
+#+begin_src emacs-lisp
+(use-package company
+  :after lsp-mode
+  :hook (lsp-mode . company-mode)
+  :bind (:map company-active-map
+         ("<tab>" . company-complete-selection))
+        (:map lsp-mode-map
+         ("<tab>" . company-indent-or-complete-common))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0))
+
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+#+end_src
+
+**** Treemacs
+#+begin_src emacs-lisp
+(use-package lsp-treemacs
+  :after lsp)
+#+end_src
+*** Python
+*** JavaScript
+*** C#
+*** C/C++
+*** Vue
+*** Html
+*** TypeScript
+#+begin_src emacs-lisp
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+  :hook (typescript-mode . lsp-deferred)
+  :config
+  (setq typescript-indent-level 2))
+#+end_src
 * Keybinds
 #+begin_src emacs-lisp
 (use-package general
