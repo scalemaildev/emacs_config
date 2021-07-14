@@ -4,15 +4,41 @@
 * Introduction
 This is John Conway's Emacs configuration (mostly stolen from Runemacs).
 - Started: 12/20/2018
-- Last Update: 07/12/2021
+- Last Update: 07/13/2021
+  
+** Setup
+1. Install  [[https://madmalik.github.io/mononoki/][Mononoki]] font (and on Windows, the /All the Icons/ fonts)
+2. Install any desired LSP language packages (jsts for example)
+3. Clone config.org to .emacs.d
+4. Compile the auto-tangle for configuration files section
+5. Restart and download all packages
+6. Restart again to ensure everything is running smoothly
+7. Enjoy~
 
 ** For Windows Taskbar Pinning
 1. Run Emacs
 2. Pin icon to taskbar
-3. Right click icon -> right click Emacs -> properties -> point to runemacs.exe
-   
-** Requirements
-This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font. Also, make sure to run /(all-the-icons-install-fonts)/ on a fresh setup. On Windows, the .tff files will need to be manually installed
+3. Right click icon -> right click Emacs -> properties -> point to runemacs.exe   
+
+* Package Management
+** Package
+#+begin_src emacs-lisp
+(require 'package)
+(setq package-enable-at-startup nil)
+(setq package-archives '(("org"   . "http://orgmode.org/elpa/")
+                         ("gnu"   . "http://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")))
+(package-initialize)
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+#+end_src
+
+** Use-Package
+#+begin_src emacs-lisp
+(require 'use-package)
+(setq use-package-always-ensure 't)
+#+end_src
 
 * General Settings
 ** Basic Functionality
@@ -99,26 +125,6 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
       (org-babel-tangle))))
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'configorg/org-babel-tangle-config)))
-#+end_src
-
-* Package Management
-** Package
-#+begin_src emacs-lisp
-(require 'package)
-(setq package-enable-at-startup nil)
-(setq package-archives '(("org"   . "http://orgmode.org/elpa/")
-                         ("gnu"   . "http://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")))
-(package-initialize)
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-#+end_src
-
-** Use-Package
-#+begin_src emacs-lisp
-(require 'use-package)
-(setq use-package-always-ensure 't)
 #+end_src
 
 * Packages
@@ -375,8 +381,10 @@ This configuration uses [[https://madmalik.github.io/mononoki/][Mononoki]] font.
   :config
   (require 'dap-python))
 #+end_src
+
 **** Windows LSP
 Make sure Python 3 and PIP are installed and run /"pip install 'python-language-server[all]'"/ to get the language server.
+
 #+begin_src emacs-lisp
 (when (eq system-type 'windows-nt)
   (use-package lsp-python-ms
@@ -386,14 +394,18 @@ Make sure Python 3 and PIP are installed and run /"pip install 'python-language-
                           (require 'lsp-python-ms)
                           (lsp)))))
 #+end_src
+
 *** JavaScript
 Make sure NodeJS and NPM are installed and run /"npm install -g typescript-language-server typescript"/ to get the language server.
+
 #+begin_src emacs-lisp
 (use-package js2-mode
   :mode "\\.js\\'"
   :hook (js2-mode . lsp-deferred))
 #+end_src
+
 *** Vue
+
 * Keybinds
 #+begin_src emacs-lisp
 (use-package general
