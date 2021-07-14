@@ -2,7 +2,8 @@
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
 * Introduction
-This is John Conway's Emacs configuration (mostly stolen from Runemacs).
+This is John Conway's Emacs configuration (mostly stolen from Runemacs). This will work on Windows,
+OSX, and Linux with some minor fiddling.
 - Started: 12/20/2018
 - Last Update: 07/13/2021
   
