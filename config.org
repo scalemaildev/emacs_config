@@ -25,8 +25,9 @@ This is John Conway's Emacs configuration (mostly stolen from Runemacs). This wi
 Edit these to suit the system. *Careful about pushing to github with these.*
 
 #+begin_src emacs-lisp
-(defvar configorg/default-font-size 150) ;; default font size
-(defvar configorg/default-variable-font-size 150) ;; size of variable font
+  (defvar configorg/default-font-size 150) ;; default font size
+  (defvar configorg/default-variable-font-size 150) ;; size of variable font
+  (defvar configorg/custom-file "/custom.el") ;; where to store customized variables
 #+end_src
 
 * Package Management System
@@ -77,6 +78,12 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 (use-package no-littering)
 (setq auto-save-file-name-transforms
       `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+#+end_src
+
+** Customized Variable Storage
+#+begin_src emacs-lisp
+  (setq custom-file (concat user-emacs-directory configorg/custom-file))
+  (load-file custom-file)
 #+end_src
 
 ** UI
@@ -147,6 +154,8 @@ Edit these to suit the system. *Careful about pushing to github with these.*
  'org-babel-load-languages
  '((emacs-lisp . t)))
 #+end_src
+
+#+RESULTS:
 
 *** Org Structure Template
 #+begin_src emacs-lisp
@@ -281,27 +290,29 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 #+end_src
 
 *** Shell-Pop
+Remember to select a shell type!
+
 #+begin_src emacs-lisp
-(use-package shell-pop
-  :config
-  (defcustom shell-pop-cleanup-buffer-at-process-exit t
-  "If non-nil, cleanup the shell's buffer after its process exits.")
-  (defun shell-pop--set-exit-action ()
-  (if (string= shell-pop-internal-mode "eshell")
-      (add-hook 'eshell-exit-hook 'shell-pop--kill-and-delete-window nil t)
-    (let ((process (get-buffer-process (current-buffer))))
-      (when process
-        (set-process-sentinel
-         process
-         (lambda (_proc change)
-           (when (string-match-p "\\(?:finished\\|exited\\)" change)
-	     (run-hooks 'shell-pop-process-exit-hook)
-             (when shell-pop-cleanup-buffer-at-process-exit
-               (kill-buffer))
-             (if (one-window-p)
-                 (switch-to-buffer shell-pop-last-buffer)
-               (delete-window))))))))))
-(push (cons "\\*shell\\*" display-buffer--same-window-action) display-buffer-alist)
+     (use-package shell-pop
+       :config
+       (defcustom shell-pop-cleanup-buffer-at-process-exit t
+         "If non-nil, cleanup the shell's buffer after its process exits.")
+       (defun shell-pop--set-exit-action ()
+         (if (string= shell-pop-internal-mode "eshell")
+             (add-hook 'eshell-exit-hook 'shell-pop--kill-and-delete-window nil t)
+           (let ((process (get-buffer-process (current-buffer))))
+             (when process
+               (set-process-sentinel
+                process
+                (lambda (_proc change)
+                  (when (string-match-p "\\(?:finished\\|exited\\)" change)
+                    (run-hooks 'shell-pop-process-exit-hook)
+                    (when shell-pop-cleanup-buffer-at-process-exit
+                      (kill-buffer))
+                    (if (one-window-p)
+                        (switch-to-buffer shell-pop-last-buffer)
+                      (delete-window))))))))))
+     (push (cons "\\*shell\\*" display-buffer--same-window-action) display-buffer-alist)
 #+end_src
 
 *** Exec Path From Shell
@@ -504,7 +515,7 @@ Make sure Vue/NuxtJS are installed and run /"npm install -g vue-language-server"
 #+end_src
 
 *** Groovy
-This will require the LSP from https://github.com/GroovyLanguageServer/groovy-language-server. Make sure to place the .jar file in ~/.cache/emacs/var/lsp/server/ do to our no littering policy. The console output will tell you if it needs to go somewhere else.
+This will require the LSP from https://github.com/GroovyLanguageServer/groovy-language-server. Make sure to place the .jar file in ~/.cache/emacs/var/lsp/server/ due to our no littering policy. The console output will tell you if it needs to go somewhere else.
 
 #+begin_src emacs-lisp
 (use-package groovy-mode
