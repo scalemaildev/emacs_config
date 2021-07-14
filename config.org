@@ -504,7 +504,7 @@ Make sure Vue/NuxtJS are installed and run /"npm install -g vue-language-server"
 #+end_src
 
 *** Groovy
-This will require the LSP from https://github.com/GroovyLanguageServer/groovy-language-server. Make sure to place the .jar file in ~/.emacs.d/.cache/lsp/groovy-language-server-all.jar.
+This will require the LSP from https://github.com/GroovyLanguageServer/groovy-language-server. Make sure to place the .jar file in ~/.cache/emacs/var/lsp/server/ do to our no littering policy. The console output will tell you if it needs to go somewhere else.
 
 #+begin_src emacs-lisp
 (use-package groovy-mode
