@@ -144,7 +144,7 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 #+begin_src emacs-lisp
 (use-package doom-themes
   :config
-  (load-theme 'doom-dark+ t))
+  (load-theme 'doom-spacegrey t))
 #+end_src
 
 ** Babel
