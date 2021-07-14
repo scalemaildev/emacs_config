@@ -128,6 +128,9 @@ This is John Conway's Emacs configuration (mostly stolen from Runemacs). This wi
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'configorg/org-babel-tangle-config)))
 #+end_src
 
+#+RESULTS:
+| (lambda nil (add-hook 'after-save-hook #'configorg/org-babel-tangle-config)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+
 ** Shell
 #+begin_src emacs-lisp
 (defun configorg/configure-eshell ()
@@ -446,6 +449,16 @@ Make sure Vue/NuxtJS are installed and run /"npm install -g vue-language-server"
   :mode "\\.vue\\'"
   :config
   (add-hook 'vue-mode-hook #'lsp-deferred))
+#+end_src
+
+*** Groovy
+This will require the LSP from https://github.com/GroovyLanguageServer/groovy-language-server. Make sure to place the .jar file in ~/.emacs.d/.cache/lsp/groovy-language-server-all.jar.
+
+#+begin_src emacs-lisp
+(use-package groovy-mode
+  :mode "\\.groovy\\'"
+  :config
+  (add-hook 'groovy-mode-hook #'lsp-deferred))
 #+end_src
 
 * Keybinds
