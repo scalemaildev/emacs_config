@@ -2,8 +2,7 @@
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
 * Introduction
-This is John Conway's Emacs configuration (mostly stolen from Runemacs). This will work on Windows,
-OSX, and Linux with some minor fiddling.
+This is John Conway's Emacs configuration (mostly stolen from Runemacs). This will work on Windows, OSX, and Linux with some minor fiddling.
 - Started: 12/20/2018
 - Last Update: 07/13/2021
   
@@ -11,10 +10,11 @@ OSX, and Linux with some minor fiddling.
 1. Install  [[https://madmalik.github.io/mononoki/][Mononoki]] font (and on Windows, the /All the Icons/ fonts)
 2. Install any desired LSP language packages (jsts for example)
 3. Clone config.org to .emacs.d
-4. Compile the auto-tangle for configuration files section
-5. Restart and download all packages
-6. Restart again to ensure everything is running smoothly
-7. Enjoy~
+4. Start Emacs and open the config.org file
+5. Compile (C-c C-c) the auto-tangle elisp section
+6. Restart and download all packages (hopefully)
+7. Restart again to ensure everything is running smoothly
+8. Enjoy~
 
 ** For Windows Taskbar Pinning
 1. Run Emacs
@@ -304,6 +304,7 @@ OSX, and Linux with some minor fiddling.
 #+begin_src emacs-lisp
 (setq org-src-preserve-indentation t)
 #+end_src
+
 ** IDE Features
 *** LSP
 **** Core
@@ -316,7 +317,7 @@ OSX, and Linux with some minor fiddling.
   :commands (lsp lsp-deferred)
   :hook (lsp-mode . configorg/lsp-mode-setup)
   :init
-  (setq lsp-keymap-prefix "C-c C-l")  ;; Or 'C-l', 's-l'
+  (setq lsp-keymap-prefix "C-c C-l")
   :config
   (lsp-enable-which-key-integration t))
 #+end_src
@@ -364,13 +365,14 @@ OSX, and Linux with some minor fiddling.
   :commands dap-debug
   :config
   (require 'dap-node)
-  (dap-node-setup) ;; Automatically installs Node debug adapter if needed
+  (dap-node-setup)
 
   (general-define-key
     :keymaps 'lsp-mode-map
     :prefix lsp-keymap-prefix
     "d" '(dap-hydra t :wk "debugger")))
 #+end_src
+
 ** Languages
 *** Python
 #+begin_src emacs-lisp
