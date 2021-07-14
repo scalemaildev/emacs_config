@@ -26,8 +26,7 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 
 #+begin_src emacs-lisp
   (defvar configorg/default-font-size 150) ;; default font size
-  (defvar configorg/default-variable-font-size 150) ;; size of variable font
-  (defvar configorg/custom-file "/custom.el") ;; where to store customized variables
+  (defvar configorg/default-variable-font-size 150) ;; size of variable font  
 #+end_src
 
 * Package Management System
@@ -72,9 +71,9 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 (setq ring-bell-function 'ignore) ;; SHUT UP
 (set-language-environment "UTF-8")
 #+end_src
+
 ** No Littering
 #+begin_src emacs-lisp
-(setq user-emacs-directory "~/.cache/emacs")
 (use-package no-littering)
 (setq auto-save-file-name-transforms
       `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
@@ -82,7 +81,10 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 
 ** Customized Variable Storage
 #+begin_src emacs-lisp
-  (setq custom-file (concat user-emacs-directory configorg/custom-file))
+  (defconst custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (unless (file-exists-p custom-file)
+    (shell-command (write-region "" "" custom-file)))
+  (setq custom-file (concat user-emacs-directory "/custom.el"))
   (load-file custom-file)
 #+end_src
 
@@ -166,13 +168,13 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 
 *** Auto-Tangle Configuration Files
 #+begin_src emacs-lisp
-(defun configorg/org-babel-tangle-config ()
+(defun efs/org-babel-tangle-config ()
   (when (string-equal (file-name-directory (buffer-file-name))
                       (expand-file-name user-emacs-directory))
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
 
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'configorg/org-babel-tangle-config)))
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
 #+end_src
 
 ** Shell
