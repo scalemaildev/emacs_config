@@ -398,8 +398,8 @@ This is John Conway's Emacs configuration (mostly stolen from Runemacs). This wi
 #+end_src
 
 ** Languages
-*** Eslint
-Run /"lsp-install-server"/ and select eslint for the LSP. This will *NOT* start-up for the initial scratch buffer.
+*** Elisp
+Run /"lsp-install-server"/ and select elisp for the LSP.
 
 #+begin_src emacs-lisp
 (add-hook 'lisp-interaction-mode-hook 'lsp-mode)
