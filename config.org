@@ -128,8 +128,32 @@ This is John Conway's Emacs configuration (mostly stolen from Runemacs). This wi
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'configorg/org-babel-tangle-config)))
 #+end_src
 
+** Shell
+#+begin_src emacs-lisp
+(defun configorg/configure-eshell ()
+  (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
+  (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
+
+  (setq eshell-history-size         10000
+        eshell-buffer-maximum-lines 10000
+        eshell-hist-ignoredups t
+        eshell-scroll-to-bottom-on-input t))
+
+(use-package eshell-git-prompt
+  :after eshell)
+
+(use-package eshell
+  :hook (eshell-first-time-mode . configorg/configure-eshell)
+  :config
+
+  (with-eval-after-load 'esh-opt
+    (setq eshell-visual-commands '("htop" "zsh" "vim")))
+
+  (eshell-git-prompt-use-theme 'powerline))
+#+end_src
+
 * Packages
-** General
+** General Packages
 *** Helm
 #+begin_src emacs-lisp
 (use-package helm
@@ -365,7 +389,7 @@ This is John Conway's Emacs configuration (mostly stolen from Runemacs). This wi
   :commands dap-debug
   :config
   (require 'dap-node)
-  (dap-node-setup)
+  (dap-node-setup) ;; Automatically installs Node debug adapter if needed
 
   (general-define-key
     :keymaps 'lsp-mode-map
@@ -374,6 +398,13 @@ This is John Conway's Emacs configuration (mostly stolen from Runemacs). This wi
 #+end_src
 
 ** Languages
+*** Eslint
+Run /"lsp-install-server"/ and select eslint for the LSP. This will *NOT* start-up for the initial scratch buffer.
+
+#+begin_src emacs-lisp
+(add-hook 'lisp-interaction-mode-hook 'lsp-mode)
+#+end_src
+
 *** Python
 #+begin_src emacs-lisp
 (use-package python-mode
@@ -408,6 +439,14 @@ Make sure NodeJS and NPM are installed and run /"npm install -g typescript-langu
 #+end_src
 
 *** Vue
+Make sure Vue/NuxtJS are installed and run /"npm install -g vue-language-server"/ to get the language server.
+
+#+begin_src emacs-lisp
+(use-package vue-mode
+  :mode "\\.vue\\'"
+  :config
+  (add-hook 'vue-mode-hook #'lsp-deferred))
+#+end_src
 
 * Keybinds
 #+begin_src emacs-lisp
