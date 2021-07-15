@@ -7,7 +7,7 @@ This is John Conway's Emacs configuration (mostly stolen from Runemacs). This wi
 - Last Update: 07/13/2021
   
 ** Setup
-1. Install  [[https://madmalik.github.io/mononoki/][Mononoki]] font (and on Windows, the /All the Icons/ fonts)
+1. Install [[https://madmalik.github.io/mononoki/][Mononoki]] font and the fonts that come from /All the Icons/
 2. Install any desired LSP language packages (jsts for example)
 3. Clone config.org to .emacs.d
 4. Start Emacs and open the config.org file
@@ -156,8 +156,6 @@ Edit these to suit the system. *Careful about pushing to github with these.*
  'org-babel-load-languages
  '((emacs-lisp . t)))
 #+end_src
-
-#+RESULTS:
 
 *** Org Structure Template
 #+begin_src emacs-lisp
@@ -401,17 +399,18 @@ Remember to select a shell type!
 *** LSP
 **** Core
 #+begin_src emacs-lisp
-(defun configorg/lsp-mode-setup ()
-  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-  (lsp-headerline-breadcrumb-mode))
+  (require 'lsp-mode)
+  (defun configorg/lsp-mode-setup ()
+      (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+      (lsp-headerline-breadcrumb-mode))
 
-(use-package lsp-mode
-  :commands (lsp lsp-deferred)
-  :hook (lsp-mode . configorg/lsp-mode-setup)
-  :init
-  (setq lsp-keymap-prefix "C-c C-l")
-  :config
-  (lsp-enable-which-key-integration t))
+    (use-package lsp-mode
+      :commands (lsp lsp-deferred)
+      :hook (lsp-mode . configorg/lsp-mode-setup)
+      :init
+      (setq lsp-keymap-prefix "C-c C-l")
+      :config
+      (lsp-enable-which-key-integration t))
 #+end_src
 
 **** LSP UI
@@ -470,20 +469,20 @@ Remember to select a shell type!
 Run /"lsp-install-server"/ and select elisp for the LSP.
 
 #+begin_src emacs-lisp
-(add-hook 'lisp-interaction-mode-hook 'lsp-mode)
+  (add-hook 'lisp-interaction-mode-hook 'lsp-mode)
 #+end_src
 
 *** Python
 Make sure Python 3 and PIP are installed and run /"pip install 'python-language-server[all]'"/ to get the language server.
 
 #+begin_src emacs-lisp
-(use-package python-mode
-  :ensure t
-  :hook (python-mode . lsp-deferred)
-  :custom
-  (dap-python-debugger 'debugpy)
-  :config
-  (require 'dap-python))
+  (use-package python-mode
+    :ensure t
+    :hook (python-mode . lsp-deferred)
+    :custom
+    (dap-python-debugger 'debugpy)
+    :config
+    (require 'dap-python))
 #+end_src
 
 **** Windows LSP
@@ -507,7 +506,7 @@ Make sure NodeJS and NPM are installed and run /"npm install -g typescript-langu
 #+end_src
 
 *** Vue
-Make sure Vue/NuxtJS are installed and run /"npm install -g vue-language-server"/ to get the language server.
+Make sure Vue/NuxtJS are installed and run /"npm install -g vls"/ to get the language server.
 
 #+begin_src emacs-lisp
 (use-package vue-mode
