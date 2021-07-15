@@ -496,6 +496,11 @@ Make sure Python 3 and PIP are installed and run /"pip install 'python-language-
                           (lsp)))))
 #+end_src
 
+**** Renpy
+#+begin_src emacs-lisp
+(use-package renpy)
+#+end_src
+
 *** JavaScript
 Make sure NodeJS and NPM are installed and run /"npm install -g typescript-language-server typescript"/ to get the language server.
 
