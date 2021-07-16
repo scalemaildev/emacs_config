@@ -508,9 +508,11 @@ Make sure Python 3 and PIP are installed and run /"pip install 'python-language-
 Make sure NodeJS and NPM are installed and run /"npm install -g typescript-language-server typescript"/ to get the language server.
 
 #+begin_src emacs-lisp
-(use-package js2-mode
-  :mode "\\.js\\'"
-  :hook (js2-mode . lsp-deferred))
+  (use-package js2-mode
+    :mode "\\.js\\'"
+    :hook (js2-mode . lsp-deferred))
+
+(setq lsp-enable-indentation nil) ;; offset is too wide
 #+end_src
 
 *** Vue
