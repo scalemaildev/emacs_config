@@ -121,15 +121,16 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 
 *** Line Numbers Mode
 #+begin_src emacs-lisp 
-  (global-display-line-numbers-mode t)
-  ;; exceptional modes
-  (dolist (mode '(org-mode-hook
-                  term-mode-hook
-                  eshell-mode-hook
-                  treemacs-mode-hook
-                  vterm-mode-hook
-                  shell-mode-hook))
-    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+      (global-display-line-numbers-mode t)
+      ;; exceptional modes
+      (dolist (mode '(org-mode-hook
+                      term-mode-hook
+                      eshell-mode-hook
+                      treemacs-mode-hook
+                      vterm-mode-hook
+                      shell-mode-hook
+                      dired-mode-hook))
+        (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
 *** Global Visual Line Mode
@@ -148,6 +149,11 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 (use-package doom-themes
   :config
   (load-theme 'doom-spacegrey t))
+#+end_src
+
+*** Dired
+#+begin_src emacs-lisp
+(add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
 #+end_src
 
 ** Babel
