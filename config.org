@@ -121,16 +121,17 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 
 *** Line Numbers Mode
 #+begin_src emacs-lisp 
-      (global-display-line-numbers-mode t)
-      ;; exceptional modes
-      (dolist (mode '(org-mode-hook
-                      term-mode-hook
-                      eshell-mode-hook
-                      treemacs-mode-hook
-                      vterm-mode-hook
-                      shell-mode-hook
-                      dired-mode-hook))
-        (add-hook mode (lambda () (display-line-numbers-mode 0))))
+        (global-display-line-numbers-mode t)
+        ;; exceptional modes
+        (dolist (mode '(org-mode-hook
+                        term-mode-hook
+                        eshell-mode-hook
+                        treemacs-mode-hook
+                        vterm-mode-hook
+                        shell-mode-hook
+                        dired-mode-hook
+                        pdf-view-mode-hook))
+          (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
 *** Global Visual Line Mode
@@ -345,6 +346,13 @@ Remember to select a shell type!
   :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 
+*** PDF-view
+
+#+begin_src emacs-lisp
+  (use-package pdf-tools)
+  (pdf-tools-install)
+#+end_src
+
 ** Org Mode
 *** Font Setup
 #+begin_src emacs-lisp
@@ -411,7 +419,21 @@ Remember to select a shell type!
 (use-package visual-fill-column
   :hook (org-mode . configorg/org-mode-visual-fill))
 #+end_src
-
+** Latex
+#+begin_src emacs-lisp
+(with-eval-after-load 'ox-latex
+(add-to-list 'org-latex-classes
+             '("org-plain-latex"
+               "\\documentclass{article}
+           [NO-DEFAULT-PACKAGES]
+           [PACKAGES]
+           [EXTRA]"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+#+end_src
 ** IDE Features
 *** LSP
 **** Core
