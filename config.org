@@ -4,7 +4,7 @@
 * Introduction
 This is John Conway's Emacs configuration (mostly stolen from Runemacs). This will work on Windows, OSX, and Linux with some minor fiddling.
 - Started: 12/20/2018
-- Last Update: 07/13/2021
+- Last Update: 08/19/2021
   
 ** Setup
 1. Install [[https://madmalik.github.io/mononoki/][Mononoki]] font and the fonts that come from /All the Icons/
@@ -64,12 +64,20 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 * General Settings
 ** Basic Functionality
 #+begin_src emacs-lisp 
-(setq inhibit-startup-message t)
-(setq confirm-kill-emacs 'yes-or-no-p)
-(setq make-backup-files nil)
-(setq auto-save-default nil)
-(setq ring-bell-function 'ignore) ;; SHUT UP
-(set-language-environment "UTF-8")
+  (setq inhibit-startup-message t)
+  (setq confirm-kill-emacs 'yes-or-no-p)
+  (setq make-backup-files nil)
+  (setq auto-save-default nil)
+  (setq ring-bell-function 'ignore) ;; SHUT UP
+  (set-language-environment "UTF-8")
+(setq byte-compile-warnings '(cl-functions)) ;; Ignore warning
+#+end_src
+
+** Server
+#+begin_src emacs-lisp
+  (require 'server)
+  (unless (server-running-p)
+    (server-start)) 
 #+end_src
 
 ** No Littering
@@ -349,8 +357,26 @@ Remember to select a shell type!
 *** PDF-view
 
 #+begin_src emacs-lisp
-  (use-package pdf-tools)
-  (pdf-tools-install)
+    (use-package pdf-tools)
+    (when (unless system-type 'windows-nt) ;; Doesn't seem to work on windows
+      (pdf-tools-install))
+#+end_src
+
+*** Straight
+#+begin_src emacs-lisp
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+(setq package-enable-at-startup nil)
 #+end_src
 
 ** Org Mode
@@ -537,7 +563,8 @@ Make sure Python 3 and PIP are installed and run /"pip install 'python-language-
 
 **** Renpy
 #+begin_src emacs-lisp
-(use-package renpy)
+;(straight-use-package
+;     '(renpy-mode :type git :host github :repo "elizagamedev/renpy-mode"))
 #+end_src
 
 *** JavaScript
@@ -569,6 +596,28 @@ This will require the LSP from https://github.com/GroovyLanguageServer/groovy-la
   :mode "\\.groovy\\'"
   :config
   (add-hook 'groovy-mode-hook #'lsp-deferred))
+#+end_src
+
+*** C#
+#+begin_src emacs-lisp
+    (use-package csharp-mode
+      :mode "\\.cs\\'"
+      :config
+      (add-hook 'csharp-mode-hook #'lsp-deferred))
+#+end_src
+
+*** Omnisharp
+#+begin_src emacs-lisp
+(use-package omnisharp)
+#+end_src
+
+** Unity
+#+begin_src emacs-lisp
+    (straight-use-package
+     '(unity :type git :host github :repo "elizagamedev/unity.el"
+             :files ("*.el" "*.c")))
+    (add-hook 'after-init-hook #'unity-build-code-shim)
+    (add-hook 'after-init-hook #'unity-setup)
 #+end_src
 
 * Keybinds
