@@ -25,8 +25,8 @@ This is John Conway's Emacs configuration (mostly stolen from Runemacs). This wi
 Edit these to suit the system. *Careful about pushing to github with these.*
 
 #+begin_src emacs-lisp
-  (defvar configorg/default-font-size 150) ;; default font size
-  (defvar configorg/default-variable-font-size 150) ;; size of variable font  
+  (defvar configorg/default-font-size 175) ;; default font size
+  (defvar configorg/default-variable-font-size 175) ;; size of variable font  
 #+end_src
 
 * Package Management System
@@ -552,19 +552,21 @@ Make sure Python 3 and PIP are installed and run /"pip install 'python-language-
 
 **** Windows LSP
 #+begin_src emacs-lisp
-(when (eq system-type 'windows-nt)
-  (use-package lsp-python-ms
-  :ensure t
-  :init (setq lsp-python-ms-auto-install-server t)
-  :hook (python-mode . (lambda ()
-                          (require 'lsp-python-ms)
-                          (lsp)))))
+      (when (eq system-type 'windows-nt)
+        (use-package lsp-python-ms
+        :ensure t
+        :init (setq lsp-python-ms-auto-install-server t)
+        :hook (python-mode . (lambda ()
+                                (require 'lsp-python-ms)
+                                (lsp)))))
 #+end_src
 
 **** Renpy
+Custom renpy-mode without the lsp server.
+
 #+begin_src emacs-lisp
-;(straight-use-package
-;     '(renpy-mode :type git :host github :repo "elizagamedev/renpy-mode"))
+  (straight-use-package
+         '(renpy-mode :type git :host github :repo "scalemaildev/renpy-mode"))
 #+end_src
 
 *** JavaScript
