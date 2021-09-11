@@ -64,13 +64,14 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 * General Settings
 ** Basic Functionality
 #+begin_src emacs-lisp 
-  (setq inhibit-startup-message t)
-  (setq confirm-kill-emacs 'yes-or-no-p)
-  (setq make-backup-files nil)
-  (setq auto-save-default nil)
-  (setq ring-bell-function 'ignore) ;; SHUT UP
-  (set-language-environment "UTF-8")
-(setq byte-compile-warnings '(cl-functions)) ;; Ignore warning
+      (setq inhibit-startup-message t)
+      (setq confirm-kill-emacs 'yes-or-no-p)
+      (setq make-backup-files nil)
+      (setq auto-save-default nil)
+      (setq ring-bell-function 'ignore) ;; SHUT UP
+      (set-language-environment "UTF-8")
+      (setq-default indent-tabs-mode nil) ;; no tabs
+    (setq byte-compile-warnings '(cl-functions)) ;; Ignore warning
 #+end_src
 
 ** Server
@@ -376,7 +377,7 @@ Remember to select a shell type!
         (goto-char (point-max))
         (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
-(setq package-enable-at-startup nil)
+  (setq package-enable-at-startup nil)
 #+end_src
 
 ** Org Mode
