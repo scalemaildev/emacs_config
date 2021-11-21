@@ -4,10 +4,10 @@
 * Introduction
 This is John Conway's Emacs configuration (mostly stolen from Runemacs). This will work on Windows, OSX, and Linux with some minor fiddling.
 - Started: 12/20/2018
-- Last Update: 08/19/2021
+- Last Update: 11/22/2021
   
 ** Setup
-1. Install [[https://madmalik.github.io/mononoki/][Mononoki]] font and the fonts that come from /All the Icons/
+1. Install [[https://github.com/blobject/agave][Agave]] font and the fonts that come from /All the Icons/
 2. Install any desired LSP language packages (jsts for example)
 3. Clone config.org to .emacs.d
 4. Start Emacs and open the config.org file
@@ -25,8 +25,8 @@ This is John Conway's Emacs configuration (mostly stolen from Runemacs). This wi
 Edit these to suit the system. *Careful about pushing to github with these.*
 
 #+begin_src emacs-lisp
-  (defvar configorg/default-font-size 175) ;; default font size
-  (defvar configorg/default-variable-font-size 175) ;; size of variable font  
+  (defvar configorg/default-font-size 150) ;; default font size
+  (defvar configorg/default-variable-font-size 150) ;; size of variable font  
 #+end_src
 
 * Package Management System
@@ -150,8 +150,8 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 
 *** Font
 #+begin_src emacs-lisp 
-(set-face-attribute 'default nil :font "Mononoki" :height configorg/default-font-size)
-(set-face-attribute 'variable-pitch nil :font "Mononoki" :height configorg/default-variable-font-size :weight 'regular)
+(set-face-attribute 'default nil :font "Agave" :height configorg/default-font-size)
+(set-face-attribute 'variable-pitch nil :font "Agave" :height configorg/default-variable-font-size :weight 'regular)
 #+end_src
 
 *** Theme
