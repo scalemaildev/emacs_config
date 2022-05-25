@@ -4,7 +4,7 @@
 * Introduction
 This is John Conway's Emacs configuration (mostly stolen from Runemacs). This will work on Windows, OSX, and Linux with some minor fiddling.
 - Started: 12/20/2018
-- Last Update: 11/22/2021
+- Last Update: 05/25/2022
   
 ** Setup
 1. Install [[https://github.com/blobject/agave][Agave]] font and the fonts that come from /All the Icons/
@@ -26,7 +26,7 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 
 #+begin_src emacs-lisp
   (defvar configorg/default-font-size 150) ;; default font size
-  (defvar configorg/default-variable-font-size 150) ;; size of variable font  
+  (defvar configorg/default-variable-font-size 150) ;; size of variable font 
 #+end_src
 
 * Package Management System
@@ -191,6 +191,9 @@ Edit these to suit the system. *Careful about pushing to github with these.*
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
 #+end_src
+
+#+RESULTS:
+| (lambda nil (add-hook 'after-save-hook #'efs/org-babel-tangle-config)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
 
 ** Shells
 *** Vterm
@@ -536,6 +539,20 @@ Run /"lsp-install-server"/ and select elisp for the LSP.
 
 #+begin_src emacs-lisp
   (add-hook 'lisp-interaction-mode-hook 'lsp-mode)
+#+end_src
+
+*** YAML
+
+#+begin_src emacs-lisp
+    (use-package yaml-mode
+    :ensure t)
+#+end_src
+
+*** Solidity
+
+#+begin_src emacs-lisp
+    (use-package solidity-mode
+    :ensure t)
 #+end_src
 
 *** Python
