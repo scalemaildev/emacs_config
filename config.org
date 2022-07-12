@@ -4,7 +4,7 @@
 * Introduction
 This is John Conway's Emacs configuration (mostly stolen from Runemacs). This will work on Windows, OSX, and Linux with some minor fiddling.
 - Started: 12/20/2018
-- Last Update: 06/26/2022
+- Last Update: 07/12/2022
   
 ** Setup
 1. Install [[https://github.com/blobject/agave][Agave]] font and the fonts that come from /All the Icons/
@@ -646,6 +646,14 @@ This will require the LSP from https://github.com/GroovyLanguageServer/groovy-la
     (add-hook 'after-init-hook #'unity-setup)
 #+end_src
 
+** GDscript
+#+begin_src emacs-lisp
+(use-package gdscript-mode
+    :straight (gdscript-mode
+               :type git
+               :host github
+               :repo "godotengine/emacs-gdscript-mode"))
+#+end_src
 * Keybinds
 #+begin_src emacs-lisp
 (use-package general
