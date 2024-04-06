@@ -1,0 +1,663 @@
+#+TITLE: Clownway Emacs
+#+PROPERTY: header-args:emacs-lisp :tangle ./init.el
+
+* Introduction
+This is John Conway's Emacs configuration (mostly stolen from Runemacs). This will work on Windows, OSX, and Linux with some minor fiddling.
+- Started: 12/20/2018
+- Last Update: 07/12/2022
+  
+** Setup
+1. Install [[https://github.com/blobject/agave][Agave]] font and the fonts that come from /All the Icons/
+2. Install any desired LSP language packages (jsts for example)
+3. Clone config.org to .emacs.d
+4. Start Emacs and open the config.org file
+5. Compile (C-c C-c) the auto-tangle elisp section
+6. Restart and download all packages (hopefully)
+7. Restart again to ensure everything is running smoothly
+8. Enjoy~
+
+** For Windows Taskbar Pinning
+1. Run Emacs
+2. Pin icon to taskbar
+3. Right click icon -> right click Emacs -> properties -> point to runemacs.exe   
+
+** Global Variables
+Edit these to suit the system. *Careful about pushing to github with these.*
+
+#+begin_src emacs-lisp
+  (defvar configorg/default-font-size 150) ;; default font size
+  (defvar configorg/default-variable-font-size 150) ;; size of variable font 
+#+end_src
+
+* Package Management System
+** Package
+#+begin_src emacs-lisp
+(require 'package)
+(setq package-enable-at-startup nil)
+(setq package-archives '(("org"   . "http://orgmode.org/elpa/")
+                         ("gnu"   . "http://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")))
+(package-initialize)
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+#+end_src
+
+** Use-Package
+#+begin_src emacs-lisp
+(require 'use-package)
+(setq use-package-always-ensure 't)
+#+end_src
+
+** Update Reminders
+#+begin_src emacs-lisp
+(use-package auto-package-update
+  :custom
+  (auto-package-update-interval 7)
+  (auto-package-update-prompt-before-update t)
+  (auto-package-update-hide-results t)
+  :config
+  (auto-package-update-maybe)
+  (auto-package-update-at-time "09:00"))
+#+end_src
+
+* General Settings
+** Basic Functionality
+#+begin_src emacs-lisp 
+      (setq inhibit-startup-message t)
+      (setq confirm-kill-emacs 'yes-or-no-p)
+      (setq make-backup-files nil)
+      (setq auto-save-default nil)
+      (setq ring-bell-function 'ignore) ;; SHUT UP
+      (set-language-environment "UTF-8")
+      (setq-default indent-tabs-mode nil) ;; no tabs
+    (setq byte-compile-warnings '(cl-functions)) ;; Ignore warning
+#+end_src
+
+** Server
+#+begin_src emacs-lisp
+  (require 'server)
+  (unless (server-running-p)
+    (server-start)) 
+#+end_src
+
+** No Littering
+#+begin_src emacs-lisp
+(use-package no-littering)
+(setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+#+end_src
+
+** Customized Variable Storage
+#+begin_src emacs-lisp
+  (defconst custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (unless (file-exists-p custom-file)
+    (shell-command (write-region "" "" custom-file)))
+  (setq custom-file (concat user-emacs-directory "/custom.el"))
+  (load-file custom-file)
+#+end_src
+
+** UI
+*** Fullscreen Mode
+#+begin_src emacs-lisp 
+(setq ns-use-native-fullscreen t)
+(set-frame-parameter nil 'fullscreen 'fullboth)
+#+end_src
+
+*** Menus and Bars
+#+begin_src emacs-lisp 
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(tooltip-mode -1)
+(set-fringe-mode 5)
+(menu-bar-mode -1)
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(add-to-list 'default-frame-alist '(ns-appearance . dark))
+(setq ns-use-proxy-icon  nil)
+(setq frame-title-format nil)
+#+end_src
+
+*** Stretchy Cursor
+#+begin_src emacs-lisp
+(setq x-stretch-cursor t)
+#+end_src
+
+*** Parenthesis Mode
+#+begin_src emacs-lisp 
+(setq show-paren-delay 0)
+(show-paren-mode 1)
+#+end_src
+
+*** Line Numbers Mode
+#+begin_src emacs-lisp 
+        (global-display-line-numbers-mode t)
+        ;; exceptional modes
+        (dolist (mode '(org-mode-hook
+                        term-mode-hook
+                        eshell-mode-hook
+                        treemacs-mode-hook
+                        shell-mode-hook
+                        dired-mode-hook
+                        pdf-view-mode-hook))
+          (add-hook mode (lambda () (display-line-numbers-mode 0))))
+#+end_src
+
+*** Global Visual Line Mode
+#+begin_src emacs-lisp
+(setq-default global-visual-line-mode t)
+#+end_src
+
+*** Font
+#+begin_src emacs-lisp 
+(set-face-attribute 'default nil :font "Agave" :height configorg/default-font-size)
+(set-face-attribute 'variable-pitch nil :font "Agave" :height configorg/default-variable-font-size :weight 'regular)
+#+end_src
+
+*** Theme
+#+begin_src emacs-lisp
+(use-package doom-themes
+  :config
+  (load-theme 'doom-spacegrey t))
+#+end_src
+
+*** Dired
+#+begin_src emacs-lisp
+(add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
+#+end_src
+
+** Babel
+*** Load Languages
+#+begin_src emacs-lisp 
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)))
+#+end_src
+
+*** Org Structure Template
+#+begin_src emacs-lisp
+(with-eval-after-load 'org
+  (require 'org-tempo)
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
+#+end_src
+
+*** Auto-Tangle Configuration Files
+#+begin_src emacs-lisp
+(defun efs/org-babel-tangle-config ()
+  (when (string-equal (file-name-directory (buffer-file-name))
+                      (expand-file-name user-emacs-directory))
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+#+end_src
+
+#+RESULTS:
+| (lambda nil (add-hook 'after-save-hook #'efs/org-babel-tangle-config)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+
+** Shells
+*** Eshell
+#+begin_src emacs-lisp
+  (defun configorg/configure-eshell ()
+    (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
+    (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
+
+    (setq eshell-history-size         10000
+          eshell-buffer-maximum-lines 10000
+          eshell-hist-ignoredups t
+          eshell-scroll-to-bottom-on-input t))
+
+  (use-package eshell-git-prompt
+    :after eshell)
+
+  (use-package eshell
+    :hook (eshell-first-time-mode . configorg/configure-eshell)
+    :config
+
+    (with-eval-after-load 'esh-opt
+      (setq eshell-visual-commands '("htop" "zsh" "vim")))
+
+    (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
+
+    (eshell-git-prompt-use-theme 'powerline))
+#+end_src
+
+* Packages
+** General Packages
+*** Helm
+#+begin_src emacs-lisp
+(use-package helm
+  :init
+  (setq helm-M-x-fuzzy-match t
+	helm-mode-fuzzy-match t
+	helm-buffers-fuzzy-matching t
+	helm-recentf-fuzzy-match t
+	helm-locate-fuzzy-match t
+	helm-semantic-fuzzy-match t
+	helm-imenu-fuzzy-match t
+	helm-completion-in-region-fuzzy-match t
+	helm-candidate-number-list 150
+	helm-split-window-inside-p t
+	helm-move-to-line-cycle-in-source t
+	helm-echo-input-in-header-line t
+	helm-autoresize-max-height 0
+	helm-autoresize-min-height 20)
+  :config
+  (helm-mode t))
+#+end_src
+
+*** Projectile
+#+begin_src emacs-lisp
+(use-package projectile
+  :config
+  (projectile-mode t))
+#+end_src
+
+*** Helm-Projectile
+#+begin_src emacs-lisp
+(use-package helm-projectile
+  :init
+  (setq helm-projectile-fuzzy-match t)
+  :config
+  (helm-projectile-on))
+#+end_src
+
+*** All The Icons
+#+begin_src emacs-lisp
+(use-package all-the-icons)
+(unless (member "all-the-icons" (font-family-list))
+  (all-the-icons-install-fonts t))
+#+end_src
+
+*** Magit
+#+begin_src emacs-lisp
+(use-package magit)
+#+end_src
+
+*** Flycheck
+#+begin_src emacs-lisp
+(use-package flycheck)
+#+end_src
+
+*** Beacon
+#+begin_src emacs-lisp
+(use-package beacon
+  :init
+  (beacon-mode t))
+#+end_src
+
+*** Dimmer
+#+begin_src emacs-lisp
+(use-package dimmer
+  :init
+  (dimmer-mode))
+#+end_src
+
+*** Which Key
+#+begin_src emacs-lisp
+(use-package which-key
+  :init (which-key-mode)
+  :diminish (which-key-mode)
+  :config
+  (setq which-key-idle-delay 0.3))
+#+end_src
+
+*** Spaceline
+#+begin_src emacs-lisp
+(use-package spaceline
+  :init
+  (spaceline-helm-mode))
+(use-package spaceline-all-the-icons
+  :after spaceline
+  :config (spaceline-all-the-icons-theme))
+#+end_src
+
+*** Shell-Pop
+Remember to select a shell type!
+
+#+begin_src emacs-lisp
+     (use-package shell-pop
+       :config
+       (defcustom shell-pop-cleanup-buffer-at-process-exit t
+         "If non-nil, cleanup the shell's buffer after its process exits.")
+       (defun shell-pop--set-exit-action ()
+         (if (string= shell-pop-internal-mode "eshell")
+             (add-hook 'eshell-exit-hook 'shell-pop--kill-and-delete-window nil t)
+           (let ((process (get-buffer-process (current-buffer))))
+             (when process
+               (set-process-sentinel
+                process
+                (lambda (_proc change)
+                  (when (string-match-p "\\(?:finished\\|exited\\)" change)
+                    (run-hooks 'shell-pop-process-exit-hook)
+                    (when shell-pop-cleanup-buffer-at-process-exit
+                      (kill-buffer))
+                    (if (one-window-p)
+                        (switch-to-buffer shell-pop-last-buffer)
+                      (delete-window))))))))))
+     (push (cons "\\*shell\\*" display-buffer--same-window-action) display-buffer-alist)
+#+end_src
+
+*** Exec Path From Shell
+#+begin_src emacs-lisp
+(use-package exec-path-from-shell)
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
+#+end_src
+
+*** Rainbow Delimiters
+#+begin_src emacs-lisp
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+
+*** PDF-view
+
+#+begin_src emacs-lisp
+    (use-package pdf-tools)
+    (when (unless system-type 'windows-nt) ;; Doesn't seem to work on windows
+      (pdf-tools-install))
+#+end_src
+
+*** Straight
+#+begin_src emacs-lisp
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+  (setq package-enable-at-startup nil)
+#+end_src
+
+** Org Mode
+*** Font Setup
+#+begin_src emacs-lisp
+(defun configorg/org-font-setup ()
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil :font "Mononoki" :weight 'regular :height (cdr face)))
+
+  (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+  (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))  
+#+end_src
+
+*** Org Mode Setup
+#+begin_src emacs-lisp
+(defun configorg/org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode t)
+  (visual-line-mode t))
+
+(use-package org
+  :pin org
+  :hook (org-mode . configorg/org-mode-setup)
+  :config
+  (setq org-ellipsis " ↴↴↴")
+  (advice-add 'org-refile :after 'org-save-all-org-buffers)
+
+  (configorg/org-mode-setup))
+#+end_src
+
+*** Nicer Bullets
+#+begin_src emacs-lisp
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+#+end_src
+
+*** Centering
+#+begin_src emacs-lisp
+(defun configorg/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :hook (org-mode . configorg/org-mode-visual-fill))
+#+end_src
+** Latex
+#+begin_src emacs-lisp
+(with-eval-after-load 'ox-latex
+(add-to-list 'org-latex-classes
+             '("org-plain-latex"
+               "\\documentclass{article}
+           [NO-DEFAULT-PACKAGES]
+           [PACKAGES]
+           [EXTRA]"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+#+end_src
+** IDE Features
+*** LSP
+**** Core
+#+begin_src emacs-lisp
+  (defun configorg/lsp-mode-setup ()
+      (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+      (lsp-headerline-breadcrumb-mode))
+
+    (use-package lsp-mode
+      :commands (lsp lsp-deferred)
+      :hook (lsp-mode . configorg/lsp-mode-setup)
+      :init
+      (setq lsp-keymap-prefix "C-c C-l")
+      :config
+      (lsp-enable-which-key-integration t))
+#+end_src
+
+**** LSP UI
+#+begin_src emacs-lisp
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
+#+end_src
+
+**** Company
+#+begin_src emacs-lisp
+(use-package company
+  :after lsp-mode
+  :hook (lsp-mode . company-mode)
+  :bind (:map company-active-map
+         ("<tab>" . company-complete-selection))
+        (:map lsp-mode-map
+         ("<tab>" . company-indent-or-complete-common))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0))
+
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+#+end_src
+
+**** Treemacs
+#+begin_src emacs-lisp
+(use-package lsp-treemacs
+  :after lsp)
+#+end_src
+
+*** DAP
+**** Core
+#+begin_src emacs-lisp
+(use-package dap-mode
+  ;; Uncomment the config below if you want all UI panes to be hidden by default!
+  ;; :custom
+  ;; (lsp-enable-dap-auto-configure nil)
+  ;; :config
+  ;; (dap-ui-mode 1)
+  :commands dap-debug
+  :config
+  (require 'dap-node)
+  (dap-node-setup) ;; Automatically installs Node debug adapter if needed
+
+  (general-define-key
+    :keymaps 'lsp-mode-map
+    :prefix lsp-keymap-prefix
+    "d" '(dap-hydra t :wk "debugger")))
+#+end_src
+
+** Languages
+*** YAML
+
+#+begin_src emacs-lisp
+    (use-package yaml-mode
+    :ensure t)
+#+end_src
+
+*** Solidity
+
+#+begin_src emacs-lisp
+    (use-package solidity-mode
+    :ensure t)
+#+end_src
+
+*** Python
+Make sure Python 3 and PIP are installed and run /"pip install 'python-language-server[all]'"/ to get the language server.
+
+#+begin_src emacs-lisp
+  (use-package python-mode
+    :ensure t
+    :hook (python-mode . lsp-deferred)
+    :custom
+    (dap-python-debugger 'debugpy)
+    :config
+    (require 'dap-python))
+#+end_src
+
+**** Windows LSP
+#+begin_src emacs-lisp
+      (when (eq system-type 'windows-nt)
+        (use-package lsp-python-ms
+        :ensure t
+        :init (setq lsp-python-ms-auto-install-server t)
+        :hook (python-mode . (lambda ()
+                                (require 'lsp-python-ms)
+                                (lsp)))))
+#+end_src
+
+**** Renpy
+Custom renpy-mode without the lsp server.
+
+#+begin_src emacs-lisp
+  (straight-use-package
+         '(renpy-mode :type git :host github :repo "scalemaildev/renpy-mode"))
+#+end_src
+
+*** JavaScript/Typescript
+Make sure NodeJS and NPM are installed and run /"npm install -g typescript-language-server typescript"/ to get the language server.
+
+#+begin_src emacs-lisp
+  (use-package js2-mode
+    :mode "\\.js\\'"
+    :hook (js2-mode . lsp-deferred))
+
+(setq lsp-enable-indentation nil) ;; offset is too wide
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package typescript-mode
+    :mode "\\.ts\\'"
+    :hook (typescript-mode . lsp-deferred))
+#+end_src
+
+*** Vue/Nuxt
+Make sure Vue/NuxtJS are installed and run /"npm install -g vls"/ to get the language server.
+
+#+begin_src emacs-lisp
+(use-package vue-mode
+  :mode "\\.vue\\'"
+  :config
+  (add-hook 'vue-mode-hook #'lsp-deferred))
+#+end_src
+
+*** Groovy
+This will require the LSP from https://github.com/GroovyLanguageServer/groovy-language-server. Make sure to place the .jar file in ~/.cache/emacs/var/lsp/server/ due to our no littering policy. The console output will tell you if it needs to go somewhere else.
+
+#+begin_src emacs-lisp
+(use-package groovy-mode
+  :mode "\\.groovy\\'"
+  :config
+  (add-hook 'groovy-mode-hook #'lsp-deferred))
+#+end_src
+
+** Unity
+#+begin_src emacs-lisp
+    (straight-use-package
+     '(unity :type git :host github :repo "elizagamedev/unity.el"
+             :files ("*.el" "*.c")))
+    (add-hook 'after-init-hook #'unity-build-code-shim)
+    (add-hook 'after-init-hook #'unity-setup)
+#+end_src
+
+** GDscript
+#+begin_src emacs-lisp
+(use-package gdscript-mode
+    :straight (gdscript-mode
+               :type git
+               :host github
+               :repo "godotengine/emacs-gdscript-mode"))
+#+end_src
+* Keybinds
+#+begin_src emacs-lisp
+(use-package general
+  :config
+  (general-define-key
+   ;; Buffers
+   "C-c v" '(split-window-below :which-key "split buffer down")
+   "C-c r" '(split-window-right :which-key "split buffer right")
+   "C-c l"  '(helm-buffers-list :which-key "buffers list")
+   ;; Windows
+   "C-c f" '(windmove-right :which-key "move right")
+   "C-c b" '(windmove-left :which-key "move left")
+   "C-c p" '(windmove-up :which-key "move up")
+   "C-c n" '(windmove-down :which-key "move down")
+   "C-c k" '(delete-window :which-key "delete window")
+   ;; Goto
+   "C-c g" '(goto-line :which-key "goto line")
+   ;; Quit
+   "<escape>" 'keyboard-escape-quit
+   ;; Helm
+   "C-c m p r"  '(helm-show-kill-ring :which-key "show kill ring")
+   "M-x" 'helm-M-x
+   "C-c m f " '(helm-find-files :which-key "helm find files")
+   ;; Projectile
+   "C-c m p f" '(projectile-find-file :which-key "projectile find file")
+   ;; Magit
+   "C-c mm" 'magit
+   ;; Shell-Pop
+   "C-c t" 'shell-pop
+   ;; Beacon
+   "C-'" '(beacon-blink :which-key "blink beacon")
+   ;; General Compiling
+   "C-c m c" '(compile :which-key "general compile")
+   "C-c m r" '(recompile :which-key "general recompile")
+   ))
+#+end_src
